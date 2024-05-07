@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}Comics{% endblock %}
+
+{% block content %}
+
+
+
+<div class="container">
+    <h1>All Comics</h1>
+
+    {% if current_user.is_admin or user_permissions.can_create_comics %}
+    <div class="d-flex flex-row-reverse">
+        <div class="p-2 justify-content-end">
+            <a href="{{ url_for('dashboard.create_comic') }}" class="btn btn-primary">Add New Comic</a>
+        </div>
+    </div>
+    {% endif %}
+
+    <table class="table table-secondary table-striped">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Title</th>
+                <th scope="col">Slug</th>
+                <th scope="col">Author</th>
+                <th scope="col">Verified</th>
+                <th scope="col">Published</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+
+
+            {% for comic in comics %}
+            <tr>
+                <th scope="row">{{ comic.id }}</th>
+                <td>{{ comic.title }}</td>
+                <td>{{ comic.slug }}</td>
+                <td>{{ comic.author.name }}</td>
+                <td>{% if comic.is_verified %}Verified{% else %}Not Verified{% endif %}</td>
+                <td>{% if comic.is_published %}Published{% else %}Not Published{% endif %}</td>
+                <td>
+                    <a href="{{ url_for('dashboard.home') }}" class="btn btn-info">View</a>
+
+                    {% if current_user.is_admin or user_permissions.can_create_comics %}
+                    <a href="{{ url_for('dashboard.create_chapter', comic_id=comic.id) }}"
+                        class="btn btn-primary">Add Chapter</a>
+                    {% endif %}
+
+                    {% if current_user.is_admin or user_permissions.can_verify_comics %}
+
+                    {% if comic.is_verified %}
+                    <a href="{{ url_for('dashboard.verify_comic', comic_id=comic.id) }}"
+                        class="btn btn-outline-success">Unverify</a>
+                    {% else %}
+                    <a href="{{ url_for('dashboard.verify_comic', comic_id=comic.id) }}"
+                        class="btn btn-success">Verify</a>
+                    {% endif %}
+
+                    {% endif %}
+                    {% if current_user.is_admin or user_permissions.can_publish_comics %}
+                    
+                    {% if comic.is_published %}
+                    <a href="{{ url_for('dashboard.publish_comic', comic_id=comic.id) }}"
+                        class="btn btn-outline-success">Unpublish</a>
+                    {% else %}
+                    <a href="{{ url_for('dashboard.publish_comic', comic_id=comic.id) }}"
+                        class="btn btn-success">Publish</a>
+                    {% endif %}
+
+                    {% endif %}
+                    {% if current_user.is_admin or user_permissions.can_edit_all_comics or comic.author.id ==
+                    current_user.id %}
+                    <a href="{{ url_for('dashboard.edit_comic', comic_id=comic.id) }}" class="btn btn-warning">Edit</a>
+                    {% endif %}
+                    {% if current_user.is_admin or user_permissions.can_delete_all_comics or comic.author.id ==
+                    current_user.id %}
+                    <a href="{{ url_for('dashboard.delete_comic', comic_id=comic.id) }}" class="btn btn-danger">Delete</a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

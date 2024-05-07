@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Users{% endblock %}
+
+{% block content %}
+
+
+
+<div class="container">
+    <h1>All Users</h1>
+
+    {% if current_user.is_admin or user_permissions.can_create_users %}
+    <div class="d-flex flex-row-reverse">
+        <div class="p-2 justify-content-end">
+            <a href="{{ url_for('dashboard.create_user') }}" class="btn btn-primary">Add New User</a>
+        </div>
+    </div>
+    {% endif %}
+
+    <table class="table table-secondary table-striped">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Username</th>
+                <th scope="col">Full Name</th>
+                <th scope="col">Email</th>
+                <th scope="col">Role</th>
+                <th scope="col">Status</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+
+
+            {% for user in users %}
+            <tr>
+                <th scope="row">{{ user.id }}</th>
+                <td>{{ user.username }}</td>
+                <td>{{ user.name }}</td>
+                <td>{{ user.email }}</td>
+                <td>{% if user.is_admin %}Admin{% else %}User{% endif %}</td>
+                <td>{% if user.is_banned %}Banned{% else %}Active{% endif %}</td>
+                <td>
+                    {% if current_user.is_admin or user_permissions.can_edit_users %}
+                    <a href="{{ url_for('dashboard.edit_user', user_id=user.id) }}" class="btn btn-warning">Edit</a>
+                    {% endif %}
+                    {% if current_user.is_admin or user_permissions.can_delete_users %}
+                    <a href="{{ url_for('dashboard.delete_user', user_id=user.id) }}" class="btn btn-danger">Delete</a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

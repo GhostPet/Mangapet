@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block title %}Create User{% endblock %}
+
+{% block content %}
+
+<div class="container">
+	<div class="row justify-content-center">
+		<div class="card col-12 col-md-10 col-lg-8">
+			<div class="card-body">
+				<div class="d-flex flex-row">
+					<a href="{{ url_for('dashboard.users') }}" class="btn btn-outline-secondary">Go Back</a>
+				</div>
+				<h1 class="card-title text-center">Create a New User</h1>
+				<form action="{{ url_for('dashboard.create_user') }}" method="POST">
+					<div class="card-body form-group">
+						{{ form.hidden_tag() }}
+
+						<div class="input-group mb-3">
+							<span class="input-group-text" id="name-label">Full Name</span>
+							{{ form.name(class="form-control", placeholder="John Johnson", aria_label="Name",
+							aria_describedby="name-label") }}
+						</div>
+
+						<div class="input-group mb-3">
+							<span class="input-group-text" id="username-label">@</span>
+							{{ form.username(class="form-control", placeholder="Username", aria_label="Username",
+							aria_describedby="username-label") }}
+						</div>
+
+						<div class="input-group mb-3">
+							<span class="input-group-text" id="email-label">Email</span>
+							{{ form.email(class="form-control", placeholder="john@example.com", aria_label="Email",
+							aria_describedby="email-label") }}
+						</div>
+
+						<div class="mb-2">
+							<div class="input-group">
+								<span class="input-group-text" id="password-label">Password</span>
+								{{ form.password(class="form-control", placeholder="Password", aria_label="Password",
+								aria_describedby="password") }}
+							</div>
+							<div class="form-text" id="pass-label">Password must be 8-20 characters, including lowercase
+								and uppercase letters, numbers and symbols.</div>
+						</div>
+					</div>
+
+					<hr>
+
+					<h3 class="card-title">Permissions</h3>
+					<div class="card-body form-group row">
+						<div class="col-4">
+							{{ form.can_access_dashboard(class="form-check-input",
+							aria_describedby="can_access_dashboard") }}
+							{{ form.can_access_dashboard.label(class="form-label") }}
+						</div>
+						<div class="col-4 fw-medium">
+							{{ form.is_admin(class="form-check-input",
+							aria_describedby="is_admin") }}
+							{{ form.is_admin.label(class="form-label") }}
+						</div>
+						<div class="col-4 fw-medium">
+							{{ form.is_banned(class="form-check-input",
+							aria_describedby="is_banned") }}
+							{{ form.is_banned.label(class="form-label") }}
+						</div>
+						<center>
+							<hr style="width:80%;">
+						</center>
+						<div class="col-4">
+							{{ form.can_access_users(class="form-check-input",
+							aria_describedby="can_access_users") }}
+							{{ form.can_access_users.label(class="form-label") }}
+						</div>
+						<div class="col-4">
+							{{ form.can_access_all_comics(class="form-check-input",
+							aria_describedby="can_access_all_comics") }}
+							{{ form.can_access_all_comics.label(class="form-label") }}
+						</div>
+						<div class="col-4">
+							{{ form.can_access_all_chapters(class="form-check-input",
+							aria_describedby="can_access_all_chapters") }}
+							{{ form.can_access_all_chapters.label(class="form-label") }}
+						</div>
+						<center>
+							<hr style="width:80%;">
+						</center>
+						<div class="col-4">
+							{{ form.can_create_comics(class="form-check-input",
+							aria_describedby="can_create_comics") }}
+							{{ form.can_create_comics.label(class="form-label") }}
+						</div>
+						<div class="col-4">
+							{{ form.can_edit_comics(class="form-check-input",
+							aria_describedby="can_edit_comics") }}
+							{{ form.can_edit_comics.label(class="form-label") }}
+						</div>
+						<div class="col-4">
+							{{ form.can_edit_all_comics(class="form-check-input",
+							aria_describedby="can_edit_all_comics") }}
+							{{ form.can_edit_all_comics.label(class="form-label") }}
+						</div>
+						<div class="col-6">
+							{{ form.can_delete_comics(class="form-check-input",
+							aria_describedby="can_delete_comics") }}
+							{{ form.can_delete_comics.label(class="form-label") }}
+						</div>
+						<div class="col-6">
+							{{ form.can_delete_all_comics(class="form-check-input",
+							aria_describedby="can_delete_all_comics") }}
+							{{ form.can_delete_all_comics.label(class="form-label") }}
+						</div>
+						<center>
+							<hr style="width:80%;">
+						</center>
+						<div class="col-4">
+							{{ form.can_create_chapters(class="form-check-input",
+							aria_describedby="can_create_chapters") }}
+							{{ form.can_create_chapters.label(class="form-label") }}
+						</div>
+						<div class="col-4">
+							{{ form.can_create_all_chapters(class="form-check-input",
+							aria_describedby="can_create_all_chapters") }}
+							{{ form.can_create_all_chapters.label(class="form-label") }}
+						</div>
+						<div class="col-4">
+							{{ form.can_edit_chapters(class="form-check-input",
+							aria_describedby="can_edit_chapters") }}
+							{{ form.can_edit_chapters.label(class="form-label") }}
+						</div>
+						<div class="col-4">
+							{{ form.can_edit_all_chapters(class="form-check-input",
+							aria_describedby="can_edit_all_chapters") }}
+							{{ form.can_edit_all_chapters.label(class="form-label") }}
+						</div>
+						<div class="col-4">
+							{{ form.can_delete_chapters(class="form-check-input",
+							aria_describedby="can_delete_chapters") }}
+							{{ form.can_delete_chapters.label(class="form-label") }}
+						</div>
+						<div class="col-4">
+							{{ form.can_delete_all_chapters(class="form-check-input",
+							aria_describedby="can_delete_all_chapters") }}
+							{{ form.can_delete_all_chapters.label(class="form-label") }}
+						</div>
+						<center>
+							<hr style="width:80%;">
+						</center>
+						<div class="col-6">
+							{{ form.can_verify_comics(class="form-check-input",
+							aria_describedby="can_verify_comics") }}
+							{{ form.can_verify_comics.label(class="form-label") }}
+						</div>
+						<div class="col-6">
+							{{ form.can_publish_comics(class="form-check-input",
+							aria_describedby="can_publish_comics") }}
+							{{ form.can_publish_comics.label(class="form-label") }}
+						</div>
+						<div class="col-6">
+							{{ form.can_verify_chapters(class="form-check-input",
+							aria_describedby="can_verify_chapters") }}
+							{{ form.can_verify_chapters.label(class="form-label") }}
+						</div>
+						<div class="col-6">
+							{{ form.can_publish_chapters(class="form-check-input",
+							aria_describedby="can_publish_chapters") }}
+							{{ form.can_publish_chapters.label(class="form-label") }}
+						</div>
+					</div>
+
+					<hr>
+
+					<div class="card-body form-group">
+						<div class="input-group mb-3 d-grid gap-2">
+							{{ form.submit(class="btn btn-secondary") }}
+						</div>
+					</div>
+
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% endblock %}

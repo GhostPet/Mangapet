@@ -1,0 +1,409 @@
+{% extends "base.html" %}
+
+{% block title %}Create Comic{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="card col-12 col-md-10 col-lg-8">
+            <div class="card-body">
+                <div class="d-flex flex-row">
+                    <a href="{{ url_for('dashboard.comics') }}" class="btn btn-outline-secondary">Go Back</a>
+                </div>
+
+                {% if form.errors %}
+                <div class="alert alert-danger mt-3">
+                    <ul>
+                        {% for error in form.errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+
+                <h1 class="card-title text-center">Create a New Comic</h1>
+                <form action="{{ url_for('dashboard.create_comic') }}" method="POST" enctype="multipart/form-data">
+                    <div class="card-body form-group row">
+                        {{ form.hidden_tag() }}
+
+                        <div class="col-12 mb-3">
+                            <div class="input-group">
+                                <span class="input-group-text" id="title-label">Title</span>
+                                {{ form.title(class="form-control", placeholder="Title", aria_label="Title",
+                                aria_describedby="title-label") }}
+                            </div>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="input-group">
+                                <span class="input-group-text" id="slug-label">Slug</span>
+                                {{ form.slug(class="form-control", placeholder="slug", aria_label="Slug",
+                                aria_describedby="slug-label") }}
+                            </div>
+                            <div class="form-text" id="pass-label">Slug can only contain letters, numbers, and hyphens.
+                                Leave empty to auto-generate.
+                            </div>
+                        </div>
+
+                        <div class="col-6 mb-3">
+                            <div class="input-group">
+                                <span class="input-group-text" id="cover-label">Cover</span>
+                                {{ form.cover_img(class="form-control", aria_describedby="cover-label") }}
+                            </div>
+                        </div>
+
+                        {% if current_user.is_admin %}
+                        <div class="col-6 mb-3">
+                            <div class="input-group">
+                                <span class="input-group-text" id="author-label">Author</span>
+                                {{ form.author(class="form-select", id="author-select", aria_label="Author",
+                                aria_describedby="author-label") }}
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if current_user.is_admin or user_permissions.can_verify_comics %}
+                        <div class="col-auto mb-3">
+                            <div class="input-group">
+                                <div class="input-group-text">
+                                    {{ form.is_verified(class="form-check-input mt-0", aria_label="Verified",
+                                    aria_describedby="verified-label") }}
+                                </div>
+                                <span class="input-group-text" id="verified-label">Verified</span>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if current_user.is_admin or user_permissions.can_publish_comics %}
+                        <div class="col-auto mb-3">
+                            <div class="input-group">
+                                <div class="input-group-text">
+                                    {{ form.is_published(class="form-check-input mt-0", aria_label="Published",
+                                    aria_describedby="published-label") }}
+                                </div>
+                                <span class="input-group-text" id="published-label">Published</span>
+                            </div>
+                        </div>
+                        {% endif %}
+
+
+                        <div class="col-12">
+                            <div class="input-group">
+                                <span class="input-group-text" id="description-label">Description</span>
+                                {{ form.description(class="form-control", placeholder="Description",
+                                aria_label="Description",
+                                aria_describedby="description-label", rows="5") }}
+                            </div>
+                        </div>
+
+                        <!-- Hidden form variables -->
+                        {{ form.users_perms(class="form-control", type="hidden", id="user-perms-list") }}
+                    </div>
+
+                    <hr>
+
+                    <h3>Permissions</h3>
+                    <div class="card-body form-group row">
+
+                        <div class="card">
+                            <div class="card-header mt-3">
+                                <h5 class="card-title">Add New User</h5>
+                            </div>
+                            <div class="card-body row">
+
+                                <div class="col-12 col-lg-7 mb-3">
+                                    <div class="input-group">
+                                        <span class="input-group-text" id="user-select-label">User Select</span>
+                                        <select class="form-select" name="user-select" id="user-select"
+                                            aria_label="user-select" aria_describedby="user-select-label">
+                                            {% for author in author_choices %}
+                                            <option value="{{ author.id }}">{{ author.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-auto col-lg-auto mb-3">
+                                    <div class="input-group">
+                                        <a class="btn btn-outline-secondary" id="select-all-button">Select
+                                            All</a>
+                                    </div>
+                                </div>
+
+                                <div class="col-auto col-lg-auto mb-3">
+                                    <div class="input-group">
+                                        <a class="btn btn-secondary" id="add-user-button">Add User</a>
+                                    </div>
+                                </div>
+
+                                <div class="col-12"></div>
+
+                                <div class="col-12 col-md-6 col-xl-auto mb-3">
+                                    <div class="input-group">
+                                        <div class="input-group-text">
+                                            <input type="checkbox" id="can-add-chapters" class="form-check-input mt-0"
+                                                aria-label="Users Can Add Chapters"
+                                                aria-describedby="can-add-chapters-label">
+                                        </div>
+                                        <span class="input-group-text" id="can-add-chapters-label">Add Chapters</span>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-md-6 col-xl-auto mb-3">
+                                    <div class="input-group">
+                                        <div class="input-group-text">
+                                            <input type="checkbox" id="can-edit-chapters" class="form-check-input mt-0"
+                                                aria-label="Users Can Edit Chapters"
+                                                aria-describedby="can-edit-chapters-label">
+                                        </div>
+                                        <span class="input-group-text" id="can-edit-chapters-label">Edit Chapters</span>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-md-6 col-xl-auto mb-3">
+                                    <div class="input-group">
+                                        <div class="input-group-text">
+                                            <input type="checkbox" id="can-delete-chapters"
+                                                class="form-check-input mt-0" aria-label="Users Can Delete Chapters"
+                                                aria-describedby="can-delete-chapters-label">
+                                        </div>
+                                        <span class="input-group-text" id="can-delete-chapters-label">Delete
+                                            Chapters</span>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="card-body">
+                                <table class="table table-stripped">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">#</th>
+                                            <th scope="col">User Name</th>
+                                            <th scope="col">Add Chapters</th>
+                                            <th scope="col">Edit Chapters</th>
+                                            <th scope="col">Delete Chapters</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="user-permissions">
+
+                                        <tr id="default-user">
+                                        </tr>
+
+
+
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <script>
+                                // On Page Load - Add Default User
+                                let defaultUser = document.getElementById('default-user');
+                                defaultUser.innerHTML = `
+                                        <td>{{ current_user.id }}</td>
+                                        <td>{{ current_user.name }}</td>
+                                        <td><input type="checkbox" disabled checked class="form-check-input mt-0" aria-label="Users Can Add Chapters" aria-describedby="can-add-chapters-label"></td>
+                                        <td><input type="checkbox" disabled checked class="form-check-input mt-0" aria-label="Users Can Edit Chapters" aria-describedby="can-edit-chapters-label"></td>
+                                        <td><input type="checkbox" disabled checked class="form-check-input mt-0" aria-label="Users Can Delete Chapters" aria-describedby="can-delete-chapters-label"></td>
+                                    `;
+                                // Clear hidden form field
+                                let userPermsList = document.getElementById('user-perms-list');
+                                userPermsList.value = '';
+
+
+                                // On Author Changed - Change Default User
+                                let authorSelect = document.getElementById('author-select');
+                                authorSelect.addEventListener('change', (event) => {
+                                    let authorSelectOptions = authorSelect.options;
+                                    let selectedAuthor = authorSelectOptions[authorSelect.selectedIndex];
+                                    let selectedAuthorId = selectedAuthor.value;
+                                    let selectedAuthorName = selectedAuthor.text;
+
+                                    // Delete if user is already added
+                                    deleteUser(selectedAuthorId);
+
+                                    // Change default user to selected user
+                                    defaultUser.innerHTML = `
+                                        <td>${selectedAuthorId}</td>
+                                        <td>${selectedAuthorName}</td>
+                                        <td><input type="checkbox" disabled checked class="form-check-input mt-0" aria-label="Users Can Add Chapters" aria-describedby="can-add-chapters-label"></td>
+                                        <td><input type="checkbox" disabled checked class="form-check-input mt-0" aria-label="Users Can Edit Chapters" aria-describedby="can-edit-chapters-label"></td>
+                                        <td><input type="checkbox" disabled checked class="form-check-input mt-0" aria-label="Users Can Delete Chapters" aria-describedby="can-delete-chapters-label"></td>
+                                        `;
+                                });
+
+                                // Select All Button
+                                let selectAllButton = document.getElementById('select-all-button');
+                                selectAllButton.addEventListener('click', (event) => {
+
+                                    let canAddChapters = document.getElementById('can-add-chapters');
+                                    let canEditChapters = document.getElementById('can-edit-chapters');
+                                    let canDeleteChapters = document.getElementById('can-delete-chapters');
+
+                                    if (canAddChapters.checked && canEditChapters.checked && canDeleteChapters.checked) {
+                                        canAddChapters.checked = false;
+                                        canEditChapters.checked = false;
+                                        canDeleteChapters.checked = false;
+                                    } else {
+                                        canAddChapters.checked = true;
+                                        canEditChapters.checked = true;
+                                        canDeleteChapters.checked = true;
+                                    }
+                                });
+
+                                // Add User Button
+                                let addUserButton = document.getElementById('add-user-button');
+                                addUserButton.addEventListener('click', (event) => {
+                                    let userSelect = document.getElementById('user-select');
+                                    let userSelectOptions = userSelect.options;
+                                    let selectedUser = userSelectOptions[userSelect.selectedIndex];
+                                    let selectedUserId = selectedUser.value;
+                                    let selectedUserName = selectedUser.text;
+
+                                    let canAddChapters = document.getElementById('can-add-chapters');
+                                    let canEditChapters = document.getElementById('can-edit-chapters');
+                                    let canDeleteChapters = document.getElementById('can-delete-chapters');
+
+                                    // Second, user can't be added if it is already added
+                                    let userPermissions2 = document.getElementById('user-permissions');
+                                    let userPermissionsRows = userPermissions2.rows;
+                                    for (let i = 0; i < userPermissionsRows.length; i++) {
+                                        let userPermissionsRow = userPermissionsRows[i];
+                                        let userPermissionsRowCells = userPermissionsRow.cells;
+                                        let userPermissionsRowCell = userPermissionsRowCells[1];
+                                        let userPermissionsRowCellText = userPermissionsRowCell.innerText;
+                                        if (userPermissionsRowCellText == selectedUserName) {
+                                            alert('User is already added.');
+                                            return;
+                                        }
+                                    }
+
+                                    // User can't be added if it has no permissions
+                                    if (!canAddChapters.checked && !canEditChapters.checked && !canDeleteChapters.checked) {
+                                        alert('User has no permissions.');
+                                        return;
+                                    }
+
+                                    // TODO: First, add the user to the hidden form field
+                                    let userPermsList = document.getElementById('user-perms-list');
+                                    let userPermsListValue = userPermsList.value;
+                                    userPermsList.value = userPermsListValue + selectedUserId + ',' + canAddChapters.checked + ',' + canEditChapters.checked + ',' + canDeleteChapters.checked + ';';
+
+                                    // Then, add the user to the user permissions table
+                                    let userPermissions = document.getElementById('user-permissions');
+                                    let userPermission = document.createElement('tr');
+                                    userPermission.innerHTML = `
+                                        <td>${selectedUserId}</td>
+                                        <td>${selectedUserName}</td>
+                                        <td><input type="checkbox" ${canAddChapters.checked ? 'checked' : ''} class="form-check-input mt-0" aria-label="Users Can Add Chapters" aria-describedby="can-add-chapters-label" onclick="changeChecked('add','${selectedUserId}');" ></td>
+                                        <td><input type="checkbox" ${canEditChapters.checked ? 'checked' : ''} class="form-check-input mt-0" aria-label="Users Can Edit Chapters" aria-describedby="can-edit-chapters-label" onclick="changeChecked('edit','${selectedUserId}');"></td>
+                                        <td><input type="checkbox" ${canDeleteChapters.checked ? 'checked' : ''} class="form-check-input mt-0" aria-label="Users Can Delete Chapters" aria-describedby="can-delete-chapters-label" onclick="changeChecked('delete','${selectedUserId}');"></td>
+                                        `;
+
+                                    userPermissions.appendChild(userPermission);
+                                });
+
+                                function deleteUser(userId) {
+                                    let userPermissions = document.getElementById('user-permissions');
+                                    let userPermissionsRows = userPermissions.rows;
+                                    for (let i = 0; i < userPermissionsRows.length; i++) {
+                                        let userPermissionsRow = userPermissionsRows[i];
+                                        let userPermissionsRowCells = userPermissionsRow.cells;
+                                        let userPermissionsRowCell = userPermissionsRowCells[0];
+                                        let userPermissionsRowCellText = userPermissionsRowCell.innerText;
+
+                                        if (userPermissionsRowCellText == userId.toString()) {
+                                            userPermissionsRow.remove();
+                                        }
+                                    }
+
+                                    // Delete from the hidden form field
+                                    let userPermsList = document.getElementById('user-perms-list');
+                                    let userPermsListValue = userPermsList.value;
+                                    let userPermsListArray = userPermsListValue.split(';');
+                                    userPermsListArray.pop();
+                                    for (let i = 0; i < userPermsListArray.length; i++) {
+                                        let userPermsListArrayItem = userPermsListArray[i].toString();
+                                        if (userPermsListArrayItem.startsWith(userId.toString())) {
+                                            userPermsListArray.splice(i, 1);
+
+                                            // Then update the hidden form field
+                                            userPermsList.value = '';
+                                            for (let j = 0; j < userPermsListArray.length; j++) {
+                                                userPermsList.value = userPermsList.value + userPermsListArray[j] + ';';
+                                            }
+
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                function changeChecked(permission, userId) {
+                                    let userPermsList = document.getElementById('user-perms-list');
+                                    let userPermsListValue = userPermsList.value;
+                                    let userPermsListArray = userPermsListValue.split(';');
+                                    userPermsListArray.pop();
+                                    for (let i = 0; i < userPermsListArray.length; i++) {
+                                        let userPermsListArrayItem = userPermsListArray[i].toString();
+                                        if (userPermsListArrayItem.startsWith(userId.toString())) {
+                                            let userPermsListArrayItemArray = userPermsListArrayItem.split(',');
+                                            if (permission == 'add') {
+                                                if (userPermsListArrayItemArray[1] == 'true') {
+                                                    userPermsListArrayItemArray[1] = 'false';
+                                                } else {
+                                                    userPermsListArrayItemArray[1] = 'true';
+                                                }
+                                            } else if (permission == 'edit') {
+                                                if (userPermsListArrayItemArray[2] == 'true') {
+                                                    userPermsListArrayItemArray[2] = 'false';
+                                                } else {
+                                                    userPermsListArrayItemArray[2] = 'true';
+                                                }
+                                            } else if (permission == 'delete') {
+                                                if (userPermsListArrayItemArray[3] == 'true') {
+                                                    userPermsListArrayItemArray[3] = 'false';
+                                                } else {
+                                                    userPermsListArrayItemArray[3] = 'true';
+                                                }
+                                            }
+
+                                            userPermsListArray[i] = userPermsListArrayItemArray.join(',');
+
+                                            // Delete if all permissions are false
+                                            if (userPermsListArrayItemArray[1] == 'false' && userPermsListArrayItemArray[2] == 'false' && userPermsListArrayItemArray[3] == 'false') {
+                                                userPermsListArray.splice(i, 1);
+                                                deleteUser(userId.toString());
+                                            }
+
+                                            break;
+                                        }
+                                    }
+
+                                    // Then update the hidden form field
+                                    userPermsList.value = '';
+                                    for (let j = 0; j < userPermsListArray.length; j++) {
+                                        userPermsList.value = userPermsList.value + userPermsListArray[j] + ';';
+                                    }
+                                }
+
+                            </script>
+
+                        </div>
+
+                    </div>
+
+                    <hr>
+
+                    <div class="card-body form-group">
+                        <div class="input-group mb-3 d-grid gap-2">
+                            {{ form.submit(class="btn btn-secondary") }}
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
